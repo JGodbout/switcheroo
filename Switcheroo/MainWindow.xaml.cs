@@ -31,6 +31,7 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using ManagedWinapi;
@@ -332,21 +333,46 @@ namespace Switcheroo
             // Force a rendering before repositioning the window
             SizeToContent = SizeToContent.Manual;
             SizeToContent = SizeToContent.WidthAndHeight;
-
             // Position the window in the center of the screen
             if (Settings.Default.ShowInCursorScreen)
             {
-                Screen MouseScreen = Screen.FromPoint(System.Windows.Forms.Cursor.Position);
-                Left = MouseScreen.Bounds.X + (MouseScreen.Bounds.Width / 2) - (ActualWidth / 2);
-                Top = (MouseScreen.Bounds.Height / 2) - (ActualHeight / 2);
+                CenterWindowOnCursorScreen(this);
             }
             else
             {
                 Left = (SystemParameters.PrimaryScreenWidth / 2) - (ActualWidth / 2);
                 Top = (SystemParameters.PrimaryScreenHeight / 2) - (ActualHeight / 2);
             }
+            
         }
+        
+        public void CenterWindowOnCursorScreen(Window window)
+        {
+            if (window == null) return;
 
+            // Get the DPI scale
+            DpiScale dpi = VisualTreeHelper.GetDpi(window);
+
+            // Get the screen where the cursor is located
+            Screen currentScreen = Screen.FromPoint(new System.Drawing.Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y));
+
+            // Screen dimensions
+            double screenWidth = currentScreen.Bounds.Width;
+            double screenHeight = currentScreen.Bounds.Height;
+
+            // Window dimensions
+            double windowWidth = window.Width * dpi.DpiScaleX;
+            double windowHeight = window.Height * dpi.DpiScaleY;
+
+            // Calculate centered position on the current screen
+            double left = currentScreen.Bounds.X + (screenWidth - windowWidth) / 2.0;
+            double top = currentScreen.Bounds.Y + (screenHeight - windowHeight) / 2.0;
+
+            // Set the window's position
+            window.Left = left / dpi.DpiScaleX;
+            window.Top = top / dpi.DpiScaleY;
+        }
+        
         /// <summary>
         /// Switches the window associated with the selected item.
         /// </summary>
