@@ -262,9 +262,9 @@ namespace Switcheroo
         /// <summary>
         /// Populates the window list with the current running windows.
         /// </summary>
-        private void LoadData(InitialFocus focus)
+        private void LoadData(InitialFocus focus, bool altTabMode)
         {
-            _unfilteredWindowList = new WindowFinder().GetWindows(Settings.Default.ShowOnlyCursorScreenWindows).Select(window => new AppWindowViewModel(window)).ToList();
+            _unfilteredWindowList = new WindowFinder().GetWindows(altTabMode).Select(window => new AppWindowViewModel(window)).ToList();
 
             var firstWindow = _unfilteredWindowList.FirstOrDefault();
 
@@ -286,6 +286,8 @@ namespace Switcheroo
                 window.FormattedTitle = new XamlHighlighter().Highlight(new[] {new StringPart(window.AppWindow.Title)});
                 window.FormattedProcessTitle =
                     new XamlHighlighter().Highlight(new[] {new StringPart(window.AppWindow.ProcessTitle)});
+                var displayName = Screen.FromHandle(window.AppWindow.HWnd).DeviceName;
+                window.ScreenInfo = displayName.Substring(displayName.Length - 1);
             }
 
             lb.DataContext = null;
@@ -295,7 +297,7 @@ namespace Switcheroo
 
             tb.Clear();
             tb.Focus();
-            CenterWindow();
+            CenterWindow(altTabMode);
             ScrollSelectedItemIntoView();
         }
 
@@ -325,7 +327,8 @@ namespace Switcheroo
         /// <summary>
         /// Place the Switcheroo window in the center of the screen
         /// </summary>
-        private void CenterWindow()
+        /// <param name="altTabMode"></param>
+        private void CenterWindow(bool currentScreen)
         {
             // Reset height every time to ensure that resolution changes take effect
             Border.MaxHeight = SystemParameters.PrimaryScreenHeight;
@@ -334,7 +337,7 @@ namespace Switcheroo
             SizeToContent = SizeToContent.Manual;
             SizeToContent = SizeToContent.WidthAndHeight;
             // Position the window in the center of the screen
-            if (Settings.Default.ShowInCursorScreen)
+            if (currentScreen)
             {
                 CenterWindowOnCursorScreen(this);
             }
@@ -486,7 +489,7 @@ namespace Switcheroo
                 Show();
                 Activate();
                 Keyboard.Focus(tb);
-                LoadData(InitialFocus.NextItem);
+                LoadData(InitialFocus.NextItem, altTabMode: false);
                 Opacity = 1;
             }
             else
@@ -522,11 +525,11 @@ namespace Switcheroo
                 Keyboard.Focus(tb);
                 if (e.ShiftDown)
                 {
-                    LoadData(InitialFocus.PreviousItem);
+                    LoadData(InitialFocus.PreviousItem, Settings.Default.ShowOnlyCursorScreenWindows);
                 }
                 else
                 {
-                    LoadData(InitialFocus.NextItem);
+                    LoadData(InitialFocus.NextItem, Settings.Default.ShowOnlyCursorScreenWindows);
                 }
 
                 if (Settings.Default.AutoSwitch && !e.CtrlDown)

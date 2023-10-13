@@ -75,6 +75,8 @@ namespace Switcheroo
             }
         }
 
+        public string ScreenInfo { get; set; }
+
         #endregion
 
         #region INotifyPropertyChanged Members

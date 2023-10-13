@@ -162,11 +162,15 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20" />
                                     <ColumnDefinition Width="22" />
                                     <ColumnDefinition Width="400" />
                                     <ColumnDefinition Width="106" />
                                 </Grid.ColumnDefinitions>
-                                <Image Height="19" Grid.Row="0" Grid.Column="0" Margin="3,0"
+                                <TextBlock local:FormattedTextAttribute.FormattedText="{Binding Path=ScreenInfo}"
+                                           Grid.Row="0" Grid.Column="0" Margin="3,0">
+                                </TextBlock>
+                                <Image Height="19" Grid.Row="0" Grid.Column="1" Margin="3,0"
                                        Opacity="{Binding IsBeingClosed, Converter={StaticResource ImageOpacityConverter}, Mode=OneTime}">
                                     <Image.Source>
                                         <PriorityBinding>
@@ -179,7 +183,7 @@
                                     </Image.Source>
                                 </Image>
                                 <TextBlock local:FormattedTextAttribute.FormattedText="{Binding Path=FormattedTitle}"
-                                           Grid.Row="0" Grid.Column="1" Margin="3,0">
+                                           Grid.Row="0" Grid.Column="2" Margin="3,0">
                                     <TextBlock.Foreground>
                                         <SolidColorBrush
                                             Color="{Binding IsBeingClosed, Converter={StaticResource TitleColorConverter}, Mode=OneTime}" />
@@ -187,7 +191,7 @@
                                 </TextBlock>
                                 <TextBlock
                                     local:FormattedTextAttribute.FormattedText="{Binding Path=FormattedProcessTitle}"
-                                    Grid.Row="0" Grid.Column="2" Margin="0" TextAlignment="Right">
+                                    Grid.Row="0" Grid.Column="3" Margin="0" TextAlignment="Right">
                                     <TextBlock.Foreground>
                                         <SolidColorBrush
                                             Color="{Binding IsBeingClosed, Converter={StaticResource ProcessColorConverter}, Mode=OneTime}" />
