@@ -45,6 +45,12 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace Switcheroo
 {
+    public enum LoadDataMode
+    {
+        Normal,
+        AltTab,
+        AltTick
+    }
     public partial class MainWindow : Window
     {
         private WindowCloser _windowCloser;
@@ -62,6 +68,7 @@ namespace Switcheroo
         private AltTabHook _altTabHook;
         private SystemWindow _foregroundWindow;
         private bool _altTabAutoSwitch;
+        private AltTickHook _altTickHook;
 
         public MainWindow()
         {
@@ -161,6 +168,12 @@ namespace Switcheroo
             _altTabHook = new AltTabHook();
             _altTabHook.Pressed += AltTabPressed;
         }
+        
+        private void SetUpAltTickHook()
+        {
+            _altTickHook = new AltTickHook();
+            _altTickHook.Pressed += AltTickPressed;
+        }
 
         private void SetUpNotifyIcon()
         {
@@ -259,12 +272,14 @@ namespace Switcheroo
             return null;
         }
 
+        
+
         /// <summary>
         /// Populates the window list with the current running windows.
         /// </summary>
-        private void LoadData(InitialFocus focus, bool altTabMode)
+        private void LoadData(InitialFocus focus, LoadDataMode loadDataMode)
         {
-            _unfilteredWindowList = new WindowFinder().GetWindows(altTabMode).Select(window => new AppWindowViewModel(window)).ToList();
+            _unfilteredWindowList = new WindowFinder().GetWindows(loadDataMode == LoadDataMode.AltTab, loadDataMode == LoadDataMode.AltTick).Select(window => new AppWindowViewModel(window)).ToList();
 
             var firstWindow = _unfilteredWindowList.FirstOrDefault();
 
@@ -297,7 +312,7 @@ namespace Switcheroo
 
             tb.Clear();
             tb.Focus();
-            CenterWindow(altTabMode);
+            CenterWindow(loadDataMode == LoadDataMode.AltTab || loadDataMode == LoadDataMode.AltTick);
             ScrollSelectedItemIntoView();
         }
 
@@ -489,7 +504,7 @@ namespace Switcheroo
                 Show();
                 Activate();
                 Keyboard.Focus(tb);
-                LoadData(InitialFocus.NextItem, altTabMode: false);
+                LoadData(InitialFocus.NextItem, LoadDataMode.Normal);
                 Opacity = 1;
             }
             else
@@ -523,13 +538,71 @@ namespace Switcheroo
                 ActivateAndFocusMainWindow();
 
                 Keyboard.Focus(tb);
+                LoadDataMode mode = Settings.Default.ShowOnlyCursorScreenWindows
+                    ? LoadDataMode.AltTab : LoadDataMode.Normal;
                 if (e.ShiftDown)
                 {
-                    LoadData(InitialFocus.PreviousItem, Settings.Default.ShowOnlyCursorScreenWindows);
+                    LoadData(InitialFocus.PreviousItem, mode);
                 }
                 else
                 {
-                    LoadData(InitialFocus.NextItem, Settings.Default.ShowOnlyCursorScreenWindows);
+                    LoadData(InitialFocus.NextItem, mode);
+                }
+
+                if (Settings.Default.AutoSwitch && !e.CtrlDown)
+                {
+                    _altTabAutoSwitch = true;
+                    tb.IsEnabled = false;
+                    tb.Text = "Press Alt + S to search";
+                }
+
+                Opacity = 1;
+            }
+            else
+            {
+                if (e.ShiftDown)
+                {
+                    PreviousItem();
+                }
+                else
+                {
+                    NextItem();
+                }
+            }
+        }
+        
+        private void AltTickPressed(object sender, AltTickHookEventArgs e)
+        {
+            if (!Settings.Default.AltTabHook)
+            {
+                // Ignore Alt+Tab presses if the hook is not activated by the user
+                return;
+            }
+
+            _foregroundWindow = SystemWindow.ForegroundWindow;
+
+            if (_foregroundWindow.ClassName == "MultitaskingViewFrame")
+            {
+                // If Windows' task switcher is on the screen then don't do anything
+                return;
+            }
+
+            e.Handled = true;
+
+            if (Visibility != Visibility.Visible)
+            {
+                tb.IsEnabled = true;
+
+                ActivateAndFocusMainWindow();
+
+                Keyboard.Focus(tb);
+                if (e.ShiftDown)
+                {
+                    LoadData(InitialFocus.PreviousItem, LoadDataMode.AltTick);
+                }
+                else
+                {
+                    LoadData(InitialFocus.NextItem, LoadDataMode.AltTick);
                 }
 
                 if (Settings.Default.AutoSwitch && !e.CtrlDown)
