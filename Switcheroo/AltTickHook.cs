@@ -26,14 +26,8 @@ using ManagedWinapi.Hooks;
 
 namespace Switcheroo
 {
-    public delegate void AltTickHookEventHandler(object sender, AltTickHookEventArgs args);
-
-    public class AltTickHookEventArgs : EventArgs
-    {
-        public bool CtrlDown { get; set; }
-        public bool ShiftDown { get; set; }
-        public bool Handled { get; set; }
-    }
+    public delegate void AltTickHookEventHandler(object sender, AltTabHookEventArgs args);
+    
 
     public class AltTickHook : IDisposable
     {
@@ -93,15 +87,15 @@ namespace Switcheroo
                    (keyboardMessage.Message == WM_KEYDOWN || keyboardMessage.Message == WM_SYSKEYDOWN);
         }
 
-        private AltTickHookEventArgs OnPressed(bool shiftDown, bool ctrlDown)
+        private AltTabHookEventArgs OnPressed(bool shiftDown, bool ctrlDown)
         {
-            var altTickHookEventArgs = new AltTickHookEventArgs { ShiftDown = shiftDown, CtrlDown = ctrlDown };
+            var AltTabHookEventArgs = new AltTabHookEventArgs { ShiftDown = shiftDown, CtrlDown = ctrlDown };
             var handler = Pressed;
             if (handler != null)
             {
-                handler(this, altTickHookEventArgs);
+                handler(this, AltTabHookEventArgs);
             }
-            return altTickHookEventArgs;
+            return AltTabHookEventArgs;
         }
 
         public void Dispose()

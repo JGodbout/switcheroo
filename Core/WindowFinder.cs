@@ -18,19 +18,44 @@
  * along with Switcheroo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using ManagedWinapi.Windows;
 
 namespace Switcheroo.Core
 {
     public class WindowFinder
     {
-        public List<AppWindow> GetWindows(bool CrrentScreenOnly, bool CurrentApplicationTypeOnly)
+        public List<AppWindow> GetWindows(bool CrrentScreenOnly, bool CurrentApplicationTypeOnly, SystemWindow foregroundWindow)
         {
-            var foregroundWindowHWnd = AppWindow.ForegroundWindow.HWnd;
+            var foregroundProcessName = foregroundWindow.Process.ProcessName;
+
             return AppWindow.AllToplevelWindows
-                .Where(a => a.IsAltTabWindow() && (CrrentScreenOnly ? a.IsCurrentScreenWindow() : true) && (CurrentApplicationTypeOnly ? a.HWnd == foregroundWindowHWnd : true))
+                .Where(a => IsCurrentApplicationType(CrrentScreenOnly, CurrentApplicationTypeOnly, foregroundProcessName, a))
                 .ToList();
+        }
+
+        private static bool IsCurrentApplicationType(bool CrrentScreenOnly, bool CurrentApplicationTypeOnly,
+            string foregroundProcessName, AppWindow a)
+        {
+            var isAltTabWindow = a.IsAltTabWindow();
+            if (!isAltTabWindow)
+            {
+                return false;
+            }
+            var isCurrentScreenWindow = CrrentScreenOnly ? a.IsCurrentScreenWindow() : true;
+            if (!isCurrentScreenWindow)
+            {
+                return false;
+            }
+            var isCurrentApplicationType = CurrentApplicationTypeOnly ? a.ProcessTitle == foregroundProcessName : true;
+            if (!isCurrentApplicationType)
+            {
+                return false;
+            }
+                 
+            return isAltTabWindow && isCurrentScreenWindow && isCurrentApplicationType;
         }
     }
 }

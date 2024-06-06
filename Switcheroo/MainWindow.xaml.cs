@@ -82,6 +82,8 @@ namespace Switcheroo
 
             SetUpAltTabHook();
 
+            SetUpAltTickHook();
+
             CheckForUpdates();
 
             Opacity = 0;
@@ -279,7 +281,11 @@ namespace Switcheroo
         /// </summary>
         private void LoadData(InitialFocus focus, LoadDataMode loadDataMode)
         {
-            _unfilteredWindowList = new WindowFinder().GetWindows(loadDataMode == LoadDataMode.AltTab, loadDataMode == LoadDataMode.AltTick).Select(window => new AppWindowViewModel(window)).ToList();
+            _unfilteredWindowList = new WindowFinder().GetWindows(
+                    loadDataMode == LoadDataMode.AltTab, 
+                loadDataMode == LoadDataMode.AltTick,
+                    _foregroundWindow)
+                .Select(window => new AppWindowViewModel(window)).ToList();
 
             var firstWindow = _unfilteredWindowList.FirstOrDefault();
 
@@ -298,13 +304,16 @@ namespace Switcheroo
 
             foreach (var window in _unfilteredWindowList)
             {
-                var programName = window.WindowTitle.Split('-').Last();
+                var programName = window.WindowTitle;
 
                 window.FormattedTitle = new XamlHighlighter().Highlight(new[] {new StringPart(programName)});
+                window.FormattedTitle = new XamlHighlighter().Highlight(new[] {new StringPart(programName)});
+
                 window.FormattedProcessTitle =
                     new XamlHighlighter().Highlight(new[] {new StringPart(programName)});
                 var displayName = Screen.FromHandle(window.AppWindow.HWnd).DeviceName;
                 window.ScreenInfo = displayName.Substring(displayName.Length - 1);
+                
             }
 
             lb.DataContext = null;
@@ -517,63 +526,16 @@ namespace Switcheroo
 
         private void AltTabPressed(object sender, AltTabHookEventArgs e)
         {
-            if (!Settings.Default.AltTabHook)
-            {
-                // Ignore Alt+Tab presses if the hook is not activated by the user
-                return;
-            }
+            SetupAltTabAltTick(e, LoadDataMode.AltTab);
 
-            _foregroundWindow = SystemWindow.ForegroundWindow;
-
-            if (_foregroundWindow.ClassName == "MultitaskingViewFrame")
-            {
-                // If Windows' task switcher is on the screen then don't do anything
-                return;
-            }
-
-            e.Handled = true;
-
-            if (Visibility != Visibility.Visible)
-            {
-                tb.IsEnabled = true;
-
-                ActivateAndFocusMainWindow();
-
-                Keyboard.Focus(tb);
-                LoadDataMode mode = Settings.Default.ShowOnlyCursorScreenWindows
-                    ? LoadDataMode.AltTab : LoadDataMode.Normal;
-                if (e.ShiftDown)
-                {
-                    LoadData(InitialFocus.PreviousItem, mode);
-                }
-                else
-                {
-                    LoadData(InitialFocus.NextItem, mode);
-                }
-
-                if (Settings.Default.AutoSwitch && !e.CtrlDown)
-                {
-                    _altTabAutoSwitch = true;
-                    tb.IsEnabled = false;
-                    tb.Text = "Press Alt + S to search";
-                }
-
-                Opacity = 1;
-            }
-            else
-            {
-                if (e.ShiftDown)
-                {
-                    PreviousItem();
-                }
-                else
-                {
-                    NextItem();
-                }
-            }
         }
         
-        private void AltTickPressed(object sender, AltTickHookEventArgs e)
+        private void AltTickPressed(object sender, AltTabHookEventArgs e)
+        {
+            SetupAltTabAltTick(e, LoadDataMode.AltTick);
+        }
+
+        private void SetupAltTabAltTick(AltTabHookEventArgs e, LoadDataMode altTick)
         {
             if (!Settings.Default.AltTabHook)
             {
@@ -600,11 +562,11 @@ namespace Switcheroo
                 Keyboard.Focus(tb);
                 if (e.ShiftDown)
                 {
-                    LoadData(InitialFocus.PreviousItem, LoadDataMode.AltTick);
+                    LoadData(InitialFocus.PreviousItem, altTick);
                 }
                 else
                 {
-                    LoadData(InitialFocus.NextItem, LoadDataMode.AltTick);
+                    LoadData(InitialFocus.NextItem, altTick);
                 }
 
                 if (Settings.Default.AutoSwitch && !e.CtrlDown)

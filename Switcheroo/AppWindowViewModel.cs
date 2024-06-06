@@ -27,6 +27,19 @@ namespace Switcheroo
                 return AppWindow.Title.Split('-', '|', '—', '–').Last().Trim();
             }
         }
+        
+        public string RestOfTitle
+        {
+            get
+            {
+                var length = AppWindow.Title.Length - WindowTitle.Length - 2;
+                if (length < 0)
+                {
+                    return string.Empty;
+                }
+                return AppWindow.Title.Substring(0, AppWindow.Title.Length - WindowTitle.Length - 2).Trim();
+            }
+        }
 
         public string ProcessTitle
         {
