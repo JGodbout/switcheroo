@@ -22,7 +22,10 @@ namespace Switcheroo
 
         public string WindowTitle
         {
-            get { return AppWindow.Title; }
+            get
+            {
+                return AppWindow.Title.Split('-', '|', '—', '–').Last().Trim();
+            }
         }
 
         public string ProcessTitle

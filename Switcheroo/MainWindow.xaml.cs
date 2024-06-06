@@ -298,9 +298,11 @@ namespace Switcheroo
 
             foreach (var window in _unfilteredWindowList)
             {
-                window.FormattedTitle = new XamlHighlighter().Highlight(new[] {new StringPart(window.AppWindow.Title)});
+                var programName = window.WindowTitle.Split('-').Last();
+
+                window.FormattedTitle = new XamlHighlighter().Highlight(new[] {new StringPart(programName)});
                 window.FormattedProcessTitle =
-                    new XamlHighlighter().Highlight(new[] {new StringPart(window.AppWindow.ProcessTitle)});
+                    new XamlHighlighter().Highlight(new[] {new StringPart(programName)});
                 var displayName = Screen.FromHandle(window.AppWindow.HWnd).DeviceName;
                 window.ScreenInfo = displayName.Substring(displayName.Length - 1);
             }
