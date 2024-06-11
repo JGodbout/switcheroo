@@ -25,8 +25,8 @@
         <KeyBinding Command="local:MainWindow.CloseWindowCommand" Key="X" Modifiers="Alt" />
         <KeyBinding Command="local:MainWindow.ScrollListUpCommand" Key="Up" />
         <KeyBinding Command="local:MainWindow.ScrollListDownCommand" Key="Down" />
-        <KeyBinding Command="local:MainWindow.ScrollListUpCommand" Key="K" Modifiers="Alt" />
-        <KeyBinding Command="local:MainWindow.ScrollListDownCommand" Key="J" Modifiers="Alt" />
+        <KeyBinding Command="local:MainWindow.ScrollListUpCommand" Key="I" Modifiers="Alt" />
+        <KeyBinding Command="local:MainWindow.ScrollListDownCommand" Key="K" Modifiers="Alt" />
     </Window.InputBindings>
 
     <Window.Resources>

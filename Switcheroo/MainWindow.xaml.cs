@@ -307,10 +307,9 @@ namespace Switcheroo
                 var programName = window.WindowTitle;
 
                 window.FormattedTitle = new XamlHighlighter().Highlight(new[] {new StringPart(programName)});
-                window.FormattedTitle = new XamlHighlighter().Highlight(new[] {new StringPart(programName)});
 
                 window.FormattedProcessTitle =
-                    new XamlHighlighter().Highlight(new[] {new StringPart(programName)});
+                    new XamlHighlighter().Highlight(new[] {new StringPart(window.AppWindow.ProcessTitle)});
                 var displayName = Screen.FromHandle(window.AppWindow.HWnd).DeviceName;
                 window.ScreenInfo = displayName.Substring(displayName.Length - 1);
                 
