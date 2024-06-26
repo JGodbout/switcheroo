@@ -56,9 +56,21 @@ namespace Switcheroo
                 @"<Span xml:space=""preserve"" xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"">" +
                 formattedText +
                 "</Span>";
+            var altText = @"<Span xml:space=""preserve"" xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"">" +
+                          "Empty" +
+                          "</Span>";
 
             textBlock.Inlines.Clear();
-            var result = (Span) XamlReader.Parse(formattedText);
+            Span result;
+            try
+            {
+                result = (Span)XamlReader.Parse(formattedText);
+            }
+            catch
+            {
+                result = (Span)XamlReader.Parse(altText);
+            }
+
             textBlock.Inlines.Add(result);
         }
     }
