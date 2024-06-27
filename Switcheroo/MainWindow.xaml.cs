@@ -62,6 +62,7 @@ namespace Switcheroo
         public static readonly RoutedUICommand CloseWindowCommand = new RoutedUICommand();
         public static readonly RoutedUICommand SwitchToWindowCommand = new RoutedUICommand();
         public static readonly RoutedUICommand ScrollListDownCommand = new RoutedUICommand();
+        public static readonly RoutedUICommand ScrollListLeftCommand = new RoutedUICommand();
         public static readonly RoutedUICommand ScrollListUpCommand = new RoutedUICommand();
         private OptionsWindow _optionsWindow;
         private AboutWindow _aboutWindow;
@@ -683,7 +684,7 @@ namespace Switcheroo
                 if(isClosed)
                     RemoveWindow(win);
             }
-
+            
             if (lb.Items.Count == 0)
                 HideWindow();
 
@@ -796,6 +797,12 @@ namespace Switcheroo
         {
             NextItem,
             PreviousItem
+        }
+
+        private void ScrollListLeft(object sender, ExecutedRoutedEventArgs e)
+        {
+            
+            e.Handled = true;
         }
     }
 }

@@ -18,6 +18,8 @@
                         Executed="ScrollListUp" />
         <CommandBinding Command="local:MainWindow.ScrollListDownCommand"
                         Executed="ScrollListDown" />
+        <CommandBinding Command="local:MainWindow.ScrollListLeftCommand"
+                        Executed="ScrollListLeft" />
     </Window.CommandBindings>
 
     <Window.InputBindings>
@@ -25,6 +27,7 @@
         <KeyBinding Command="local:MainWindow.CloseWindowCommand" Key="X" Modifiers="Alt" />
         <KeyBinding Command="local:MainWindow.ScrollListUpCommand" Key="Up" />
         <KeyBinding Command="local:MainWindow.ScrollListDownCommand" Key="Down" />
+        <KeyBinding Command="local:MainWindow.ScrollListLeftCommand" Key="Left" />
         <KeyBinding Command="local:MainWindow.ScrollListUpCommand" Key="I" Modifiers="Alt" />
         <KeyBinding Command="local:MainWindow.ScrollListDownCommand" Key="K" Modifiers="Alt" />
     </Window.InputBindings>
@@ -76,6 +79,7 @@
                         <KeyBinding Command="local:MainWindow.ScrollListDownCommand" Key="Down" />
                         <KeyBinding Command="local:MainWindow.ScrollListUpCommand" Key="Tab" Modifiers="Shift" />
                         <KeyBinding Command="local:MainWindow.ScrollListDownCommand" Key="Tab" />
+                        <KeyBinding Command="local:MainWindow.ScrollListLeftCommand" Key="Left" />
                         <KeyBinding Command="local:MainWindow.ScrollListUpCommand" Key="OemTilde"  Modifiers="Shift"/>
                         <KeyBinding Command="local:MainWindow.ScrollListDownCommand" Key="OemTilde" />
 

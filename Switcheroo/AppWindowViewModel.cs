@@ -87,7 +87,7 @@ namespace Switcheroo
             set
             {
                 _isBeingClosed = value;
-                NotifyOfPropertyChange(() => IsBeingClosed);
+                // NotifyOfPropertyChange(() => IsBeingClosed);
             }
         }
 
